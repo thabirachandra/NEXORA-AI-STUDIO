@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#080b14">
+<title>NEXORA AI STUDIO</title>
+<style>
+:root{--bg:#080b14;--panel:#111827;--line:#253047;--text:#f4f7ff;--muted:#9aa9c2;--blue:#5a8cff;--violet:#a879ff;--green:#53e0b0}
+*{box-sizing:border-box}
+body{margin:0;background:radial-gradient(ellipse at top right,#15244b 0,transparent 40%),var(--bg);color:var(--text);font:15px system-ui,Arial,sans-serif}
+header{padding:22px 18px;border-bottom:1px solid var(--line);position:sticky;top:0;background:#080b14ed;backdrop-filter:blur(14px);z-index:2}
+.brand{font-size:23px;font-weight:900;letter-spacing:1px}.brand span{color:var(--blue)}
+.tag{color:var(--muted);font-size:12px;margin-top:4px}
+main{max-width:1100px;margin:auto;padding:22px 16px 50px}
+.hero{padding:25px 20px;border:1px solid #34466c;border-radius:22px;background:linear-gradient(130deg,#172b53,#17162f 65%,#101827);margin-bottom:24px}
+.badge{color:#92b6ff;font-size:11px;letter-spacing:2px;font-weight:800}
+h1{font-size:clamp(28px,6vw,44px);line-height:1.1;margin:13px 0}
+p{color:var(--muted);line-height:1.6}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:22px}
+.stat{background:#080d1c8c;border:1px solid #34405d;border-radius:12px;padding:13px}
+.stat strong{display:block;font-size:23px}.stat small{color:var(--muted)}
+.section-title{font-size:20px;margin:27px 0 14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:12px}
+.tool{padding:16px 13px;background:var(--panel);border:1px solid var(--line);border-radius:16px;text-align:left;color:var(--text);cursor:pointer;min-height:130px;transition:.2s}
+.tool:hover,.tool.active{border-color:var(--blue);transform:translateY(-2px);background:#17233c}
+.icon{font-size:25px}.tool strong{display:block;margin:10px 0 5px}.tool small{color:var(--muted);line-height:1.4}
+.workspace{margin-top:24px;padding:20px;border:1px solid var(--line);background:#101625;border-radius:18px}
+label{display:block;font-size:13px;color:#c9d5eb;margin:15px 0 7px}
+input,textarea,select{width:100%;padding:13px;background:#080d18;border:1px solid #303c53;border-radius:10px;color:white;font:inherit}
+textarea{min-height:110px;resize:vertical}
+button.primary{border:0;background:linear-gradient(100deg,#477cff,#9866ff);color:white;padding:12px 17px;border-radius:10px;font-weight:800;cursor:pointer;margin-top:14px}
+button.secondary{border:1px solid var(--line);background:#172033;color:white;padding:10px 13px;border-radius:9px;cursor:pointer}
+.output{white-space:pre-wrap;overflow-wrap:anywhere;min-height:80px;margin-top:16px;padding:15px;border-radius:12px;background:#080d18;border:1px solid var(--line);line-height:1.7}
+.history-item{padding:12px 0;border-bottom:1px solid var(--line);overflow-wrap:anywhere}
+footer{text-align:center;color:var(--muted);font-size:12px;padding:25px}
+.note{font-size:12px;color:#a6b5ce}
+@media(min-width:700px){.hero{padding:36px}.workspace{padding:26px}}
+</style>
+</head>
+<body>
+<header><div class="brand">NEXORA<span> AI</span> STUDIO</div><div class="tag">CREATOR INTELLIGENCE · YOUR YOUTUBE WORKSPACE</div></header>
+<main>
+<section class="hero">
+<div class="badge">YOUR CREATOR COMMAND CENTER</div>
+<h1>Turn your ideas<br>into better videos.</h1>
+<p>Plan, write, package and improve your YouTube content from one workspace.</p>
+<div class="stats">
+<div class="stat"><strong>11</strong><small>Creator tools</small></div>
+<div class="stat"><strong id="savedCount">0</strong><small>Saved drafts</small></div>
+<div class="stat"><strong>24/7</strong><small>Workspace access</small></div>
+</div></section>
+<h2 class="section-title">Choose your AI workspace</h2>
+<div class="grid" id="tools"></div>
+<section class="workspace">
+<div class="badge">CREATOR WORKSPACE</div>
+<h2 id="toolTitle">AI Script Studio</h2>
+<p id="toolDesc">Start with your video topic.</p>
+<label for="topic">Video topic or source text</label>
+<textarea id="topic" placeholder="Example: The mystery behind an ancient Indian temple..."></textarea>
+<label for="language">Language</label>
+<select id="language"><option>Hindi / Hinglish</option><option>English</option><option>Odia</option></select>
+<label for="style">Content style</label>
+<select id="style"><option>Documentary</option><option>Educational</option><option>Anime explanation</option><option>Facts and storytelling</option><option>Entertainment</option></select>
+<button class="primary" id="generate">Generate draft</button>
+<button class="secondary" id="save">Save draft</button>
+<button class="secondary" id="copy">Copy output</button>
+<div class="output" id="output">Your generated draft will appear here.</div>
+<p class="note">Starter mode: outputs use built-in templates, not a live AI model. Connect a secure backend to enable real AI generation.</p>
+</section>
+<section>
+<h2 class="section-title">Recent drafts</h2>
+<div id="history"><p>Your saved drafts will appear here.</p></div>
+</section>
+</main>
+<footer>NEXORA AI STUDIO · Creator tools in one place<br>Review your content before publishing.</footer>
+<script>
+const definitions=[
+['✍️','Script Studio','Scripts, hooks and storytelling.'],
+['🎯','Title & Thumbnail','Title ideas and thumbnail concepts.'],
+['🔎','YouTube SEO','Descriptions, keywords and hashtags.'],
+['📅','Content Planner','Video ideas and weekly plans.'],
+['📱','Shorts Studio','Short-form scripts and clip ideas.'],
+['💬','Comment Assistant','Draft thoughtful comment replies.'],
+['📈','Retention Analyzer','Review retention notes and drop-offs.'],
+['✂️','Editing Assistant','Editing plans and B-roll suggestions.'],
+['⏱️','Chapter Generator','Draft chapters from transcript text.'],
+['🔥','Viral Research','Research questions and video angles.'],
+['🩺','Channel Audit','Review your channel strategy.']
+];
+let selected=0,lastOutput='';
+const tools=document.getElementById('tools');
+definitions.forEach((d,i)=>{const b=document.createElement('button');b.className='tool'+(!i?' active':'');b.innerHTML='<span class="icon">'+d[0]+'</span><strong>'+d[1]+'</strong><small>'+d[2]+'</small>';b.onclick=()=>selectTool(i);tools.appendChild(b)});
+function selectTool(i){selected=i;document.querySelectorAll('.tool').forEach((b,j)=>b.classList.toggle('active',j===i));document.getElementById('toolTitle').textContent=definitions[i][1];document.getElementById('toolDesc').textContent=definitions[i][2];document.getElementById('output').textContent='Enter your topic or source text, then select Generate draft.'}
+function generate(){const topic=document.getElementById('topic').value.trim();if(!topic){alert('Please enter a topic or source text first.');return}const lang=document.getElementById('language').value,style=document.getElementById('style').value;const title=definitions[selected][1];const intro='TOPIC: '+topic+'\nLANGUAGE: '+lang+'\nSTYLE: '+style+'\n\n';const templates=[
+'HOOK\nWhat if everything you thought you knew about '+topic+' was only part of the story?\n\nVIDEO OUTLINE\n1. Opening hook and central question\n2. Background and context\n3. Key facts and evidence to verify\n4. Main story in clear, engaging sections\n5. What the evidence tells us\n6. Conclusion and audience question\n\nWRITING NOTE\nVerify facts and sources before recording. Expand each section into a complete narration.',
+'TITLE IDEAS\n1. The Untold Story of '+topic+'\n2. What You Need to Know About '+topic+'\n3. The Mystery Behind '+topic+'\n\nTHUMBNAIL CONCEPT\nOne clear subject, strong contrast, minimal text and a visual that accurately represents the video.\n\nTEST\nCompare title clarity and thumbnail readability on a small screen.',
+'DESCRIPTION\nExplore '+topic+' in this '+style.toLowerCase()+' video. This video covers the background, key questions and important details.\n\nKEYWORD IDEAS\n'+topic+', '+style+', explained, guide, facts\n\nHASHTAGS\n#YouTube #'+style.replace(/[^a-z]/gi,'')+'\n\nVerify search demand and avoid irrelevant tags.',
+'WEEKLY CONTENT PLAN\nDay 1: Research '+topic+'\nDay 2: Outline and verify sources\nDay 3: Write narration\nDay 4: Prepare title and thumbnail\nDay 5: Record and edit\nDay 6: Publish after review\nDay 7: Review audience feedback\n\nFollow a schedule you can maintain.',
+'SHORTS HOOK\nHere is one surprising question about '+topic+'...\n\nSHORT STRUCTURE\n0–3 seconds: Hook\n3–15 seconds: One key fact or idea\n15–30 seconds: Explanation\nFinal seconds: Payoff and relevant call to action\n\nChoose a verified, self-contained segment.',
+'COMMENT REPLY DRAFT\nThanks for sharing your thoughts! Your point about '+topic+' is worth discussing. Which part would you like us to explore next?\n\nReview the original comment and personalize this reply before posting.',
+'RETENTION REVIEW\nTopic: '+topic+'\n\nReview your retention graph and note:\n1. Timestamp of the largest drop\n2. What happens immediately before it\n3. Whether the intro matches the title promise\n4. Long pauses or repeated explanations\n5. Whether the next section gives viewers a reason to continue\n\nImport actual analytics for evidence-based conclusions.',
+'EDITING PLAN\nProject: '+topic+'\n\nOpening: Start with the strongest verified visual or question.\nMain sections: Remove repetition and unnecessary pauses.\nVisuals: Add relevant B-roll, labels and source references.\nAudio: Keep narration clear and consistent.\nEnding: Deliver the promised payoff.\n\nPrecise cuts require a transcript or video timeline.',
+'CHAPTER DRAFT\n00:00 Introduction\n00:30 Background and context\n01:30 Main topic\n03:00 Key details\n04:30 Findings and explanation\n06:00 Conclusion\n\nThese are placeholder timestamps. Use the actual video transcript and duration to produce accurate chapters.',
+'RESEARCH BRIEF\nTopic: '+topic+'\n\nQuestions to investigate:\n1. What is the strongest primary source?\n2. What is genuinely new or surprising?\n3. What do competing sources agree or disagree on?\n4. What context is often missing?\n5. What can your video explain better than existing videos?\n\nResearch competitors and cite reliable sources before scripting.',
+'CHANNEL AUDIT CHECKLIST\nFocus topic: '+topic+'\n\nReview:\n1. Audience and channel promise\n2. Recent upload consistency\n3. Title and thumbnail clarity\n4. First 30 seconds of each video\n5. Audience retention and click-through data\n6. Topics viewers respond to\n7. Next three experiments\n\nA real audit needs channel details and performance data.'
+];lastOutput=intro+templates[selected];document.getElementById('output').textContent=lastOutput}
+function readHistory(){try{return JSON.parse(localStorage.getItem('nexoraDrafts')||'[]')}catch{return []}}
+function renderHistory(){const h=readHistory();document.getElementById('savedCount').textContent=h.length;const box=document.getElementById('history');box.innerHTML='';if(!h.length){box.textContent='Your saved drafts will appear here.';return}h.slice().reverse().forEach(item=>{const div=document.createElement('div');div.className='history-item';const strong=document.createElement('strong');strong.textContent=item.title+' · '+item.date;const pre=document.createElement('p');pre.textContent=item.text.slice(0,180)+'…';const btn=document.createElement('button');btn.className='secondary';btn.textContent='Open draft';btn.onclick=()=>{selectTool(item.tool);document.getElementById('topic').value=item.topic;lastOutput=item.text;document.getElementById('output').textContent=item.text};div.append(strong,pre,btn);box.appendChild(div)})}
+
+async function generateWithBackend(){
+  const topic = document.getElementById('topic').value.trim();
+  if(!topic){
+    alert('Please enter a topic or source text first.');
+    return;
+  }
+
+  const button = document.getElementById('generate');
+  const output = document.getElementById('output');
+  const lang = document.getElementById('language').value;
+  const style = document.getElementById('style').value;
+
+  const toolMap = {
+    0: 'script',
+    1: 'title',
+    2: 'seo',
+    4: 'shorts',
+    8: 'chapters',
+    10: 'audit'
+  };
+
+  const apiTool = toolMap[selected];
+
+  if(!apiTool){
+    generate();
+    return;
+  }
+
+  button.disabled = true;
+  button.textContent = 'Connecting...';
+  output.textContent = 'Checking local backend...';
+
+  try{
+    const response = await fetch('https://nexora-ai-studio-api.onrender.com/api/generate', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        tool: apiTool,
+        topic: topic + '\nContent style: ' + style,
+        language: lang,
+        audience: 'YouTube viewers'
+      })
+    });
+
+    const data = await response.json();
+
+    if(!response.ok){
+      throw new Error(data.error || data.detail || 'Backend is not ready for AI generation.');
+    }
+
+    lastOutput = data.result || JSON.stringify(data, null, 2);
+    output.textContent = lastOutput;
+  }catch(error){
+    generate();
+    output.textContent = lastOutput +
+      '\n\n--- CONNECTION STATUS ---\n' +
+      'Local AI backend is unavailable or AI generation is not configured. ' +
+      'The draft above was created using the built-in template system.\n' +
+      'Details: ' + error.message;
+  }finally{
+    button.disabled = false;
+    button.textContent = 'Generate draft';
+  }
+}
+
+document.getElementById('generate').onclick = generateWithBackend;
+
+document.getElementById('save').onclick=()=>{if(!lastOutput||lastOutput==='Your generated draft will appear here.')return alert('Generate a draft first.');const h=readHistory();h.push({title:definitions[selected][1],tool:selected,topic:document.getElementById('topic').value,text:lastOutput,date:new Date().toLocaleDateString()});localStorage.setItem('nexoraDrafts',JSON.stringify(h.slice(-50)));renderHistory();alert('Draft saved on this browser.')};
+document.getElementById('copy').onclick=async()=>{if(!lastOutput)return;try{await navigator.clipboard.writeText(lastOutput);alert('Output copied!')}catch{alert('Clipboard unavailable. Select and copy the output manually.')}};
+renderHistory();
+</script>
+</body>
+</html>

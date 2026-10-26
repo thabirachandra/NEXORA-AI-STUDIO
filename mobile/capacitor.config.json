@@ -1,0 +1,8 @@
+{
+  "appId": "com.nexora.aistudio",
+  "appName": "NEXORA AI STUDIO",
+  "webDir": "www",
+  "server": {
+    "androidScheme": "https"
+  }
+}

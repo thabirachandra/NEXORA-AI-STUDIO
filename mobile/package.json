@@ -1,0 +1,16 @@
+{
+  "name": "nexora-ai-studio-mobile",
+  "version": "1.0.0",
+  "private": true,
+  "description": "NEXORA AI STUDIO Android application",
+  "scripts": {
+    "build": "echo Static website ready"
+  },
+  "dependencies": {
+    "@capacitor/core": "^7.4.3"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^7.4.3",
+    "@capacitor/android": "^7.4.3"
+  }
+}
