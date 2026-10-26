@@ -107,7 +107,74 @@ function generate(){const topic=document.getElementById('topic').value.trim();if
 ];lastOutput=intro+templates[selected];document.getElementById('output').textContent=lastOutput}
 function readHistory(){try{return JSON.parse(localStorage.getItem('nexoraDrafts')||'[]')}catch{return []}}
 function renderHistory(){const h=readHistory();document.getElementById('savedCount').textContent=h.length;const box=document.getElementById('history');box.innerHTML='';if(!h.length){box.textContent='Your saved drafts will appear here.';return}h.slice().reverse().forEach(item=>{const div=document.createElement('div');div.className='history-item';const strong=document.createElement('strong');strong.textContent=item.title+' · '+item.date;const pre=document.createElement('p');pre.textContent=item.text.slice(0,180)+'…';const btn=document.createElement('button');btn.className='secondary';btn.textContent='Open draft';btn.onclick=()=>{selectTool(item.tool);document.getElementById('topic').value=item.topic;lastOutput=item.text;document.getElementById('output').textContent=item.text};div.append(strong,pre,btn);box.appendChild(div)})}
-document.getElementById('generate').onclick=generate;
+
+async function generateWithBackend(){
+  const topic = document.getElementById('topic').value.trim();
+  if(!topic){
+    alert('Please enter a topic or source text first.');
+    return;
+  }
+
+  const button = document.getElementById('generate');
+  const output = document.getElementById('output');
+  const lang = document.getElementById('language').value;
+  const style = document.getElementById('style').value;
+
+  const toolMap = {
+    0: 'script',
+    1: 'title',
+    2: 'seo',
+    4: 'shorts',
+    8: 'chapters',
+    10: 'audit'
+  };
+
+  const apiTool = toolMap[selected];
+
+  if(!apiTool){
+    generate();
+    return;
+  }
+
+  button.disabled = true;
+  button.textContent = 'Connecting...';
+  output.textContent = 'Checking local backend...';
+
+  try{
+    const response = await fetch('http://127.0.0.1:8001/api/generate', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({
+        tool: apiTool,
+        topic: topic + '\nContent style: ' + style,
+        language: lang,
+        audience: 'YouTube viewers'
+      })
+    });
+
+    const data = await response.json();
+
+    if(!response.ok){
+      throw new Error(data.error || data.detail || 'Backend is not ready for AI generation.');
+    }
+
+    lastOutput = data.result || JSON.stringify(data, null, 2);
+    output.textContent = lastOutput;
+  }catch(error){
+    generate();
+    output.textContent = lastOutput +
+      '\n\n--- CONNECTION STATUS ---\n' +
+      'Local AI backend is unavailable or AI generation is not configured. ' +
+      'The draft above was created using the built-in template system.\n' +
+      'Details: ' + error.message;
+  }finally{
+    button.disabled = false;
+    button.textContent = 'Generate draft';
+  }
+}
+
+document.getElementById('generate').onclick = generateWithBackend;
+
 document.getElementById('save').onclick=()=>{if(!lastOutput||lastOutput==='Your generated draft will appear here.')return alert('Generate a draft first.');const h=readHistory();h.push({title:definitions[selected][1],tool:selected,topic:document.getElementById('topic').value,text:lastOutput,date:new Date().toLocaleDateString()});localStorage.setItem('nexoraDrafts',JSON.stringify(h.slice(-50)));renderHistory();alert('Draft saved on this browser.')};
 document.getElementById('copy').onclick=async()=>{if(!lastOutput)return;try{await navigator.clipboard.writeText(lastOutput);alert('Output copied!')}catch{alert('Clipboard unavailable. Select and copy the output manually.')}};
 renderHistory();
